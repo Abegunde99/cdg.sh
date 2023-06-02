@@ -13,27 +13,27 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
-app.get('/url/:id', (req, res) => {
-   // TODO: get a specific url
-});
+//connect to db
+const connectDb = require('./config/db');
+connectDb();
 
-app.get('/:id', (req, res) => {
-    // TODO: redirect to a specific url
-})
-
-app.post('/url', (req, res) => { 
-    // TODO: create a new url
-});
-
-app.delete('/url/:id', (req, res) => { 
-    // TODO: delete a specific url
-});
-
-app.put('/url/:id', (req, res) => {
-    // TODO: update a specific url
-});  
+const urlRouter = require('./routes/url');
+app.use('/', urlRouter);
 
 const port = process.env.PORT || 3001;
+
+//error handler
+app.use((err, req, res, next) => {
+    if (err.status) {
+        res.status(err.status);
+    } else {
+        res.status(500);
+    }
+    res.json({
+        message: err.message,
+        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
+    }); 
+});
 
 app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`);
